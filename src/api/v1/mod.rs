@@ -1,9 +1,11 @@
 use axum::{Json, Router, routing::post};
 
+use crate::AppState;
+
 use crate::error::Result;
 use crate::models::user::User;
 
-pub fn routes() -> Router {
+pub fn routes() -> Router<AppState> {
     Router::new().route("/user", post(get_user))
 }
 

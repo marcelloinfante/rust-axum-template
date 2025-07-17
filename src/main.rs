@@ -5,12 +5,23 @@ mod models;
 mod utils;
 
 use axum::{Router, http::StatusCode, response::IntoResponse};
+use sea_orm::{Database, DatabaseConnection};
+use tower_http::trace::TraceLayer;
 
 #[tokio::main]
 async fn main() {
     utils::trace::add_tracing().await;
 
-    let app: Router = Router::new().nest("/api/v1", api::v1::routes());
+    let db: DatabaseConnection = Database::connect("sqlite::memory:")
+        .await
+        .expect("Database connection failed");
+
+    let state: AppState = AppState { db };
+
+    let app: Router = Router::new()
+        .nest("/api/v1", api::v1::routes())
+        .layer(TraceLayer::new_for_http())
+        .with_state(state);
 
     let app = app.fallback(handler_404);
 
@@ -23,4 +34,9 @@ async fn main() {
 
 async fn handler_404() -> impl IntoResponse {
     (StatusCode::NOT_FOUND, "Not Found")
+}
+
+#[derive(Clone)]
+struct AppState {
+    pub db: DatabaseConnection,
 }
