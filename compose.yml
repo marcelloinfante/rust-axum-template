@@ -1,0 +1,5 @@
+services:
+  backend:
+    build: .
+    expose:
+      - 3000:3000

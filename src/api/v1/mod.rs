@@ -8,5 +8,9 @@ pub fn routes() -> Router {
 }
 
 async fn get_user(Json(user): Json<User>) -> Result<Json<User>> {
-    Ok(Json(user))
+    let new_user = User {
+        first_name: String::from("Test"),
+        last_name: String::from("Test2"),
+    };
+    Ok(Json(new_user))
 }
